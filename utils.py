@@ -8,6 +8,7 @@ from torch.utils.data import Dataset
 from torchvision import datasets, transforms
 from scipy.ndimage.interpolation import rotate as scipyrotate
 from networks import MLP, ConvNet, LeNet, AlexNet, AlexNetBN, VGG11, VGG11BN, ResNet18, ResNet18BN_AP, ResNet18BN
+from torch.autograd import Variable
 
 def get_dataset(dataset, data_path):
     if dataset == 'MNIST':
@@ -648,4 +649,12 @@ AUGMENT_FNS = {
     'scale': [rand_scale],
     'rotate': [rand_rotate],
 }
+
+def drop_path(x, drop_prob):
+  if drop_prob > 0.:
+    keep_prob = 1.-drop_prob
+    mask = Variable(torch.cuda.FloatTensor(x.size(0), 1, 1, 1).bernoulli_(keep_prob))
+    x.div_(keep_prob)
+    x.mul_(mask)
+  return x
 
